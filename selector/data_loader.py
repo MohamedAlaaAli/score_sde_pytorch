@@ -53,7 +53,7 @@ class OptimizedMRIDataset(Dataset):
         return img, 0  # Dummy label for Trainer compatibility
 
 class EfficientDataLoader:
-    def __init__(self, dataset_path, batch_size=64, num_workers=4, train_split=0.8, val_split=0.1, cache_data=False, device="cuda" if torch.cuda.is_available() else "cpu"):
+    def __init__(self, dataset_path, batch_size=4, num_workers=4, train_split=0.8, val_split=0.1, cache_data=False, device="cuda" if torch.cuda.is_available() else "cpu"):
         """
         Efficient data loader for grayscale MRI dataset (256x256).
         Args:
