@@ -11,6 +11,7 @@ from run.sde import ScoreFN
 from model.model_setup import ModelSetup
 from selector.sde_selector import _SDEs
 from selector.pc_selector import _CORRECTORS, _PREDICTORS
+import pytorch_fid
 
 
 class Sampler:
