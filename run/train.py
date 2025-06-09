@@ -5,19 +5,19 @@ from model.model_setup import ModelSetup
 from run.losses import LossFN
 from model.optimizer import OptimizerFN
 from torch_ema import ExponentialMovingAverage
-from selector.data_selector import _DATA_LOADERS
+from selector.data_loader import _DATA_LOADERS
 from selector.sde_selector import _SDEs
 from selector.optimizer_selector import _OPTIMIZERS
 from functools import cached_property
 
 class Trainer:
-    def __init__(self, config):
+    def __init__(self, config, dataset_pth):
         self.config = config
         self.logger = config.logger
         self.device = self.config.training.device
         self.model = ModelSetup(self.config, self.logger).model
         self.optimizer = _OPTIMIZERS(self.config)(self.model.parameters())
-        self.data_loader = _DATA_LOADERS(self.config)
+        self.data_loader = _DATA_LOADERS(dataset_pth)
         self.sde = _SDEs[self.config.model.sde_type](beta_min=self.config.model.beta_min, beta_max=self.config.model.beta_max, sigma_min=self.config.model.sigma_min, sigma_max=self.config.model.sigma_max, discretization_steps=self.config.model.discretization_steps, device=self.config.training.device)
         self.ema = ExponentialMovingAverage(self.model.parameters(), decay=self.config.model.ema_rate)
         self.optimize_fn = OptimizerFN(self.config)
@@ -44,7 +44,7 @@ class Trainer:
             self.epoch = epoch
             self.model.train()
             self.epoch_loss = 0.0
-            for batch_data, labels in self.train_loader:
+            for batch_data, _ in self.train_loader:
                 batch_data = batch_data.to(self.device)
                 batch_data = self.data_loader.data_scaler(batch_data)
                 loss = self.epoch_fn(self.model, self.optimizer, self.ema, epoch, batch_data)
@@ -82,7 +82,7 @@ class Trainer:
         if self.epoch % self.config.training.eval_freq == 0:
             self.evaluate_loss = 0
             self.model.eval()
-            for batch_data, labels in self.eval_loader:
+            for batch_data, _ in self.eval_loader:
                 batch_data = batch_data.to(self.device)
                 batch_data = self.data_loader.data_scaler(batch_data)
                 with torch.no_grad():

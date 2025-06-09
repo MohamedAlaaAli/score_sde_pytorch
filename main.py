@@ -43,7 +43,7 @@ def main():
     try:
         if args.mode == 'train':
             from run.train import Trainer
-            trainer = Trainer(config)
+            trainer = Trainer(config,"/home/muhamed/mntdrive/Graduation Project/sauron/dataset/brain_fastMRI_DICOM/fastMRI_brain_DICOM")
             trainer.train()
         elif args.mode == 'sample':
             from run.sample import Sampler
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     from run.sde import VESDE
     from model.optimizer import AdamOptimizer
     from model.ncsnpp import NCSNpp
-    from config.ve.cifar10_ncsnpp_cont import CIFAR10NCSNPPContConfig
+    from config.ve.cifar10_ncsnpp_cont import HFMRIContConfig
     from model.predictors import ReverseDiffusionPredictor
     from model.correctors import NoneCorrector
     main()
