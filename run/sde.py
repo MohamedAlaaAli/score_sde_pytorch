@@ -139,9 +139,6 @@ class VESDE(SDE):
   def prior_sampling(self, shape):
     noise = torch.randn(*shape, device=self.device) * self.sigma_max
     mean = torch.zeros_like(noise, device=self.device)
-    mean[:, 0, :, :] = 0.4914
-    mean[:, 1, :, :] = 0.4822
-    mean[:, 2, :, :] = 0.4465
     return noise + mean
 
   def prior_logp_0t(self, z):
