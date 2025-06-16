@@ -78,9 +78,12 @@ class Sampler:
 
     def _save_samples_png(self):
         for _, img_array in enumerate(self.samples):
-            img = Image.fromarray(img_array.numpy())
-            img_path = self.config.io.generated_sample_png_file_path(self.saved_samples + 1)
-            img.save(img_path)
+            try:
+                img = Image.fromarray(img_array.squeeze(-1).numpy())
+                img_path = self.config.io.generated_sample_png_file_path(self.saved_samples + 1)
+                img.save(img_path)
+            except Exception as e:
+                print(f"error occured {e}")
         self.logger.info(f"Converted {self.samples.shape[0]} raw samples to {self.config.io.out_raw_sample_path}")
 
     def load_checkpoint(self):
@@ -111,7 +114,7 @@ class Sampler:
     def _update_stat(self):
         self.logger.info(f"Sampling total {self.total_samples} samples; Already generated {self.saved_samples} samples; Remaining samples: {self.remaining_samples}")
         self.iter_num += 1
-        if self.config.sampling.eval: self._eval_fid()
+        #if self.config.sampling.eval: self._eval_fid()
 
     def _eval_fid(self):
         from pytorch_fid.fid_score import calculate_fid_given_paths
