@@ -10,9 +10,9 @@ class BaseHFMRIConfig(ml_collections.ConfigDict):
         self.data.name = "HFMRI"
         self.data.image_size = 256
         self.data.color_channels = 1
-        self.data.num_workers = 4
+        self.data.num_workers = 8
 
-        self.data.random_flip = True
+        self.data.random_flip = False
         self.data.centered = False
         self.data.uniform_dequantization = False
 
@@ -21,7 +21,7 @@ class BaseHFMRIConfig(ml_collections.ConfigDict):
         self.model.out_channels = 1  # Single-channel output
 
         self.model.sigma_min = 0.01
-        self.model.sigma_max = 50
+        self.model.sigma_max = 15
         self.model.num_scales = 1000
         self.model.discretization_steps = 1000
         self.model.beta_min = 0.1
@@ -31,21 +31,21 @@ class BaseHFMRIConfig(ml_collections.ConfigDict):
         self.model.device = "cuda"
 
         self.training = ml_collections.ConfigDict()
-        self.training.batch_size = 1
+        self.training.batch_size = 128
         self.training.device = "cuda"
-        self.training.brand_new_epochs = 100
-        self.training.continue_training_epochs = 50
+        self.training.brand_new_epochs = 2000
+        self.training.continue_training_epochs = 8000
         self.training.use_all_data = False
 
-        self.training.snapshot_freq = 10
-        self.training.snapshot_batch_size = 1
+        self.training.snapshot_freq = 100
+        self.training.snapshot_batch_size = 36
         self.training.eps = 1e-5
         self.training.log_freq = 1
         self.training.eval_freq = 5
-        self.training.eval_save_least_epoch = 10
+        self.training.eval_save_least_epoch = 50
         self.training.best_evaluate_loss = 150
         self.training.snapshot_sampling = True
-        self.training.reduce_mean = False
+        self.training.reduce_mean = True
 
 
         self.sampling = ml_collections.ConfigDict()
@@ -53,9 +53,9 @@ class BaseHFMRIConfig(ml_collections.ConfigDict):
         # better not be different from the model.discretization_steps
         self.sampling.discretization_steps = 1000
         self.sampling.corrector_steps = 1
-        self.sampling.batch_size = 1
-        self.sampling.eval = True
-        self.sampling.total_samples = 1000
+        self.sampling.batch_size = 128
+        self.sampling.eval = False
+        self.sampling.total_samples = 600
         self.sampling.record_freq = 100
         self.sampling.snr = 0.16
         self.sampling.noise_removal = True
