@@ -23,7 +23,7 @@ class HFMRIContConfig(BaseHFMRIConfig):
         self.model.nf = 64
         self.model.ch_mult = (1, 2, 2, 2)
         self.model.num_res_blocks = 4
-        self.model.attn_resolutions = (32,16,8)
+        self.model.attn_resolutions = (16,)
         self.model.resamp_with_conv = True
         self.model.conditional = False
         self.model.fir = True
@@ -40,15 +40,13 @@ class HFMRIContConfig(BaseHFMRIConfig):
 
         self.io = IOConfig()
 
+class IOConfig(DynamicIOConfig):
 
-class IOConfig:
-    def __init__(self):
-        self.dataset_path = "/home/muhamed/mntdrive/Graduation Project/sauron/dataset/brain_fastMRI_DICOM/fastMRI_brain_DICOM"
-        self.out_ckpt_path = "./checkpoints"
-        self.out_ckpt_filename_prefix = "mri_model"
-        self.use_tensorboard = True
-        self.tensorboard_path = "./logs"
-        self.training_from_scratch = True
-        self.latest_checkpoint_file_path = None
-        self.latest_checkpoint_epoch = 0
-        self.out_asset_suffix = os.path.join("ve", "hfmri_ncsnpp_cont")
+    @property
+    def in_dataset_path(self): return "/home/muhamed/mntdrive/Graduation Project/sauron/dataset/brain_fastMRI_DICOM/fastMRI_brain_DICOM"
+
+    @property
+    def out_asset_suffix(self): return os.path.join("ve", "hfmri_ncsnpp_cont")
+
+    @property
+    def use_tensorboard(self): return True
