@@ -33,7 +33,12 @@ class OptimizedMRIDataset(Dataset):
             # Read DICOM file
             dicom_file = self.dicom_files[idx]
             dicom_data = pydicom.dcmread(dicom_file)
-            img = dicom_data.pixel_array.astype(np.float32)
+            try:
+                img = dicom_data.pixel_array.astype(np.float32)
+            except AttributeError as e:
+                print(f"Skipping file")
+                return self.__getitem__((idx + 1) % len(self.dicom_files))  # Retry with next file
+
 
             # Normalize to [0, 1]
             img = (img - img.min()) / (img.max() - img.min() + 1e-8)
@@ -53,7 +58,7 @@ class OptimizedMRIDataset(Dataset):
         return img, 0  # Dummy label for Trainer compatibility
 
 class EfficientDataLoader:
-    def __init__(self, dataset_path, batch_size=1, num_workers=4, train_split=0.8, val_split=0.1, cache_data=False, device="cuda" if torch.cuda.is_available() else "cpu"):
+    def __init__(self, dataset_path, batch_size=128, num_workers=8, train_split=0.8, val_split=0.1, cache_data=False, device="cuda" if torch.cuda.is_available() else "cpu"):
         """
         Efficient data loader for grayscale MRI dataset (256x256).
         Args:
