@@ -44,7 +44,9 @@ class Trainer:
             self.epoch = epoch
             self.model.train()
             self.epoch_loss = 0.0
-            for batch_data, _ in self.train_loader:
+            batch_bar = tqdm.tqdm(self.train_loader, desc=f"Epoch {epoch+1}/{self.end_epoch}", leave=False)
+
+            for batch_data, _ in batch_bar:
                 batch_data = batch_data.to(self.device)
                 batch_data = self.data_loader.data_scaler(batch_data)
                 loss = self.epoch_fn(self.model, self.optimizer, self.ema, epoch, batch_data)
