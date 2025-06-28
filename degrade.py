@@ -1,8 +1,6 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from skimage.metrics import structural_similarity as ssim
-import numpy as np
 
 # Degradation Model (Eq. 2: Gaussian blur, downsampling, noise)
 class DegradationModel:
