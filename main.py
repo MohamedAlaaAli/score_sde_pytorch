@@ -43,13 +43,14 @@ def main():
     try:
         if args.mode == 'train':
             from run.train import Trainer
-            trainer = Trainer(config,"/kaggle/input/fastmri-brain-dicom-dataset/fastMRI_brain_DICOM")
+            trainer = Trainer(config,"/home/muhamed/mntdrive/Graduation Project/sauron/dataset/brain_fastMRI_DICOM/fastMRI_brain_DICOM")
             trainer.train()
         elif args.mode == 'sample':
             from run.sample import Sampler
             sampler = Sampler(config)
             sampler.load_checkpoint()
             sampler.sample()
+        
         else:
             raise ValueError(f"Invalid mode: {args.mode}")
             
@@ -58,6 +59,29 @@ def main():
         import traceback
         logger.error(traceback.format_exc())
         sys.exit(1)
+
+
+# Add this new function:
+def get_sampler(config_name, sampling_from_epoch=None, user_logging_level="info"):
+    from utils.logger import Logger
+    from run.sample import Sampler
+
+    class Config(_CONFIGS[config_name]):
+        def __init__(self, logger, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.parse_args = None
+            self.logger = logger
+            self.mode = 'sample'
+            self.io.user_logging_level = user_logging_level
+            self.io.training_from_scratch = False
+            self.io.sampling_from_epoch = sampling_from_epoch
+
+    logger = Logger(user_logging_level)
+    config = Config(logger)
+    sampler = Sampler(config)
+    sampler.load_checkpoint()
+    return sampler
+
 
 
 if __name__ == "__main__":
