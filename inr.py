@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 # Hash Encoding for INR
 class HashEncoding(nn.Module):
-    def __init__(self, num_levels=12, max_entries=2**23, feature_dims=2, coarsest_res=2, finest_res=2048):
+    def __init__(self, num_levels=12, max_entries=2**23, feature_dims=2, coarsest_res=2, finest_res=256):
         super(HashEncoding, self).__init__()
         self.num_levels = num_levels
         self.max_entries = max_entries
@@ -22,7 +22,7 @@ class HashEncoding(nn.Module):
         
         # Initialize hash tables: num_levels tables, each with max_entries rows and feature_dims columns
         self.hash_tables = nn.ParameterList([
-            nn.Parameter(torch.randn(max_entries, feature_dims) * 0.01)
+            nn.Parameter(torch.randn(max_entries, feature_dims) * 0.001)
             for _ in range(num_levels)
         ])
         
@@ -45,6 +45,7 @@ class HashEncoding(nn.Module):
         Encode 2D coordinates (batch, num_points, 2) into feature vectors.
         Returns: (batch, num_points, num_levels * feature_dims)
         """
+        assert coords.dim() == 3 and coords.shape[-1] == 2, f"Expected shape (batch, num_points, 2), got {coords.shape}"
         batch_size, num_points, _ = coords.shape
         features = []
         
@@ -94,13 +95,14 @@ class INRMLP(nn.Module):
 # Combined INR Model (Hash Encoding + MLP)
 class INR(nn.Module):
     def __init__(self, num_levels=12, max_entries=2**23, feature_dims=2, coarsest_res=2, 
-                 hidden_dim=128, num_hidden_layers=3, output_dim=1):
+                 finest_res=256, hidden_dim=128, num_hidden_layers=3, output_dim=1):
         super(INR, self).__init__()
         self.hash_encoding = HashEncoding(
             num_levels=num_levels,
             max_entries=max_entries,
             feature_dims=feature_dims,
-            coarsest_res=coarsest_res
+            coarsest_res=coarsest_res,
+            finest_res=finest_res
         )
         self.mlp = INRMLP(
             input_dim=num_levels * feature_dims,
@@ -118,4 +120,3 @@ class INR(nn.Module):
         features = self.hash_encoding(coords)  # (batch, num_points, num_levels * feature_dims)
         intensities = self.mlp(features)       # (batch, num_points, output_dim)
         return intensities
-
