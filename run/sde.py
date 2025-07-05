@@ -119,7 +119,10 @@ class VESDE(SDE):
   @cached_property
   def T(self):
     return torch.tensor(1, device=self.device)
-
+  
+  def get_sigma(self, t):
+    return None, self.sigma_min * (self.sigma_max / self.sigma_min) ** t
+  
   def current_drift_and_diffusion(self, x, t):
     """
     For the SDE: dx = f(x, t) dt + g(x, t) dW

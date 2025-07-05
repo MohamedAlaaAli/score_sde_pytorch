@@ -88,7 +88,7 @@ class Sampler:
 
     def load_checkpoint(self):
         self.logger.info(f"Loading checkpoint from {self.config.io.sampling_ckpt_file_path}")
-        loaded_state = torch.load(self.config.io.sampling_ckpt_file_path, map_location=self.device, weights_only=True)
+        loaded_state = torch.load(self.config.io.sampling_ckpt_file_path, map_location="cpu", weights_only=True)
         self.ema.load_state_dict(loaded_state['ema'])
         self.model.load_state_dict(loaded_state['model'], strict=True)
 
