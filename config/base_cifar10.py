@@ -1,0 +1,72 @@
+import ml_collections
+
+class BaseHFMRIConfig(ml_collections.ConfigDict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.num_classes = 10
+
+        self.data = ml_collections.ConfigDict()
+        self.data.name = "HFMRI"
+        self.data.image_size = 256
+        self.data.color_channels = 1
+        self.data.num_workers = 8
+
+        self.data.random_flip = False
+        self.data.centered = False
+        self.data.uniform_dequantization = False
+
+        self.model = ml_collections.ConfigDict()
+        self.model.in_channels = 1  # Single-channel input
+        self.model.out_channels = 1  # Single-channel output
+
+        self.model.sigma_min = 0.01
+        self.model.sigma_max = 50
+        self.model.num_scales = 1000
+        self.model.discretization_steps = 1000
+        self.model.beta_min = 0.1
+        self.model.beta_max = 20.
+        self.model.dropout = 0.1
+        self.model.embedding_type = 'fourier'
+        self.model.device = "cuda"
+
+        self.training = ml_collections.ConfigDict()
+        self.training.batch_size = 1
+        self.training.device = "cuda"
+        self.training.brand_new_epochs = 5
+        self.training.continue_training_epochs = 5
+        self.training.use_all_data = False
+
+        self.training.snapshot_freq = 1
+        self.training.snapshot_batch_size = 1
+        self.training.eps = 1e-5
+        self.training.log_freq = 1
+        self.training.eval_freq = 1
+        self.training.eval_save_least_epoch = 1
+        self.training.best_evaluate_loss = 150
+        self.training.snapshot_sampling = False
+        self.training.reduce_mean = True
+
+
+        self.sampling = ml_collections.ConfigDict()
+        self.sampling.device = "cuda"
+        # better not be different from the model.discretization_steps
+        self.sampling.discretization_steps = 1000
+        self.sampling.corrector_steps = 1
+        self.sampling.batch_size = 1
+        self.sampling.eval = False
+        self.sampling.total_samples = 8
+        self.sampling.record_freq = 1
+        self.sampling.snr = 0.16
+        self.sampling.noise_removal = True
+
+        self.optim = ml_collections.ConfigDict()
+        self.optim.optimizer = "Adam"
+        self.optim.lr = 2e-4
+        self.optim.weight_decay = 0
+        self.optim.beta1 = 0.9
+        self.optim.eps = 1e-8
+        self.optim.warmup = 2
+        self.optim.grad_clip = 1.
+
+        self.seed = 42
